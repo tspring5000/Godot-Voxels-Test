@@ -1,0 +1,79 @@
+[gd_scene load_steps=13 format=3 uid="uid://cmvabnosk28mp"]
+
+[ext_resource type="Script" path="res://terrain.gd" id="1_2u46o"]
+[ext_resource type="Script" path="res://common/addons/camera.gd" id="2_fa1ko"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ioh5l"]
+
+[sub_resource type="Curve" id="Curve_23xf6"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.631068, 0.273684), 0.0, 0.0, 0, 0, Vector2(0.723301, 0.578947), 0.0, 0.0, 0, 0, Vector2(0.839806, 0.936842), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="Gradient" id="Gradient_himb2"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.428571, 0.668571, 0.805714)
+colors = PackedColorArray(0.878431, 0.784314, 0.447059, 1, 0.243137, 0.411765, 0.345098, 1, 0.384314, 0.298039, 0.235294, 1, 0.890196, 0.811765, 0.705882, 1)
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_egf2v"]
+rayleigh_coefficient = 22.54
+mie_coefficient = 0.017
+mie_eccentricity = 0.9
+mie_color = Color(0.509804, 0.384314, 0, 1)
+ground_color = Color(0, 0.470588, 0.854902, 1)
+
+[sub_resource type="Sky" id="Sky_hykfk"]
+sky_material = SubResource("PhysicalSkyMaterial_egf2v")
+
+[sub_resource type="Environment" id="Environment_p651p"]
+background_mode = 2
+sky = SubResource("Sky_hykfk")
+ambient_light_source = 3
+ambient_light_color = Color(1, 0.737255, 0.0313726, 1)
+ambient_light_sky_contribution = 0.8
+reflected_light_source = 2
+tonemap_mode = 3
+ssao_intensity = 4.0
+glow_normalized = true
+fog_light_color = Color(0.647059, 0.52549, 0.407843, 1)
+fog_density = 0.05
+volumetric_fog_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mxhec"]
+size = Vector2(10000, 10000)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2y0m0"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_stert"]
+as_normal_map = true
+noise = SubResource("FastNoiseLite_2y0m0")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uutxt"]
+albedo_color = Color(0.117647, 0.392157, 0.498039, 1)
+normal_scale = 9.99
+normal_texture = SubResource("NoiseTexture2D_stert")
+
+[node name="Terrain" type="Node3D"]
+script = ExtResource("1_2u46o")
+max_height = 50.0
+noise = SubResource("FastNoiseLite_ioh5l")
+height_mod = SubResource("Curve_23xf6")
+palette = SubResource("Gradient_himb2")
+tree_chance = 0.1
+trunk_col = Color(0.384314, 0.298039, 0.235294, 1)
+leaf_col = Color(0.243137, 0.411765, 0.345098, 1)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 50, 50)
+script = ExtResource("2_fa1ko")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.966506, -0.1875, -0.17524, 0.25, 0.533494, 0.808013, -0.0580127, -0.82476, 0.5625, 0, 0, 0)
+light_color = Color(1, 0.737255, 0.0313726, 1)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_p651p")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5, 0)
+mesh = SubResource("PlaneMesh_mxhec")
+surface_material_override/0 = SubResource("StandardMaterial3D_uutxt")
